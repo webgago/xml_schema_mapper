@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:getFirstName xmlns:cm="http://example.com/common/"
+                  xmlns:tns="http://example.com/UserService/type/"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://example.com/UserService/type/ file:/Users/antonsozontov/Projects/xml_schema_mapper/spec/fixtures/UserService.xsd">
+    <userIdentifier>xoMPRY</userIdentifier>
+    <tns:filter>
+        <tns:age>94</tns:age>
+        <tns:gender>male</tns:gender>
+    </tns:filter>
+    <isOut>a</isOut>
+    <cm:zone>b</cm:zone>
+    <options>
+        <one>p6E58</one>
+        <two>Vm1sk87pkU0pE4EKKSY</two>
+    </options>
+</tns:getFirstName>

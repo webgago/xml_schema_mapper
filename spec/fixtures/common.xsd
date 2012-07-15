@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:cm="http://example.com/common/" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://example.com/common/" version="1.0">
+
+  <xs:simpleType name="ZONE">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="a"/>
+      <xs:enumeration value="b"/>
+      <xs:enumeration value="c"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="Options">
+    <xs:sequence>
+      <xs:element name="one" type="xs:string"/>
+      <xs:element name="two" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="zone" type="cm:ZONE"/>
+  <xs:element name="options" type="cm:Options"/>
+
+</xs:schema>

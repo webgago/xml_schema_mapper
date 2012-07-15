@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://example.com/UserService/type/" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:com="http://example.com/common/"
+           targetNamespace="http://example.com/UserService/type/" version="1.0">
+
+  <xs:import namespace="http://example.com/common/" schemaLocation="common.xsd"/>
+
+  <xs:complexType name="Filter">
+    <xs:sequence>
+      <xs:element ref="tns:age"/>
+      <xs:element ref="tns:gender"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="GetFirstName">
+    <xs:annotation>
+      <xs:documentation>Foo Bar</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="userIdentifier" type="xs:string" minOccurs="0"/>
+      <xs:element ref="tns:filter" minOccurs="0"/>
+      <xs:element name="isOut" type="com:ZONE"/>
+      <xs:element ref="com:zone"/>
+      <xs:element name="options" type="com:Options"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="GetLastName">
+    <xs:annotation>
+      <xs:documentation>Foo Bar</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="tns:GetFirstName">
+        <xs:sequence>
+          <xs:element name="userIdentifier2" type="xs:string"/>
+          <xs:choice>
+            <xs:element name="one" type="xs:string" minOccurs="1"/>
+            <xs:element name="two" type="xs:string" minOccurs="1"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:element name="gender">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="male"/>
+        <xs:enumeration value="female"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <xs:element name="age">
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:minInclusive value="0"/>
+        <xs:maxInclusive value="100"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <xs:element name="filter" type="tns:Filter"/>
+  <xs:element name="getFirstName" type="tns:GetFirstName"/>
+  <xs:element name="getLastName" type="tns:GetLastName"/>
+</xs:schema>
