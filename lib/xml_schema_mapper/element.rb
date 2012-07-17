@@ -35,6 +35,10 @@ module XmlSchemaMapper
       "#{method_name}="
     end
 
+    def reader
+      "#{method_name}"
+    end
+
     def xpath(xml)
       if @xsd.namespace
         xml.at_xpath("./foo:#{name}", { 'foo' => @xsd.namespace })

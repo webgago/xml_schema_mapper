@@ -6,6 +6,7 @@ require "active_support/core_ext/class"
 
 require "xml_schema_mapper/element"
 require "xml_schema_mapper/parser"
+require "xml_schema_mapper/builder"
 
 module XmlSchemaMapper
   extend ActiveSupport::Concern
@@ -53,4 +54,13 @@ module XmlSchemaMapper
     elements.map(&:name)
   end
 
+  def to_xml
+    xml_document.root.to_xml
+  end
+
+  def xml_document
+    builder = XmlSchemaMapper::Builder.new(self)
+    builder.build
+    builder.document
+  end
 end

@@ -1,0 +1,13 @@
+<getFirstName xmlns:cm="http://example.com/common/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://example.com/UserService/type/">
+  <userIdentifier>001</userIdentifier>
+  <tns:filter>
+    <tns:age>50</tns:age>
+    <tns:gender>male</tns:gender>
+  </tns:filter>
+  <isOut>a</isOut>
+  <cm:zone>b</cm:zone>
+  <options>
+    <one>one</one>
+    <two>two</two>
+  </options>
+</getFirstName>
