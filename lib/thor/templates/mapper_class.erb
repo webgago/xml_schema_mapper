@@ -1,0 +1,16 @@
+# encoding: utf-8
+# @note <%= type.annotation.to_s.gsub("\n", "\n# ") %>
+
+<%-  elements.each do |element| -%>
+# @attr <%= element.name %> [<%= element.type.name %>] <%= element.annotation || element.type.annotation %>
+<%- end -%>
+
+<%- if options[:module_name].present? -%>
+class <%= options[:module_name] %>::<%= name.camelize %>Mapper
+<% else -%>
+class <%= name.camelize %>Mapper
+<% end -%>
+  include XmlSchemaMapper
+  schema '<%= schema_path %>'
+  type '<%= name %>'
+end

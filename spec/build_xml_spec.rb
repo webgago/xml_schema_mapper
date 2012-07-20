@@ -3,7 +3,7 @@ require "spec_helper"
 describe "Build XML" do
 
   context "by GetFirstName" do
-    let(:xml) { File.read('spec/fixtures/instance1.xml') }
+    let(:xml) { File.read('spec/fixtures/get_first_name.xml') }
 
     context "valid data" do
       let(:object) do
@@ -25,7 +25,7 @@ describe "Build XML" do
         g
       end
 
-      it "should build xml", pending: true do
+      it "should build xml" do
         object.to_xml.should eql xml
       end
     end

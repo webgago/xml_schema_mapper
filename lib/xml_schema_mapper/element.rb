@@ -1,6 +1,12 @@
+Int     = Integer
+Double  = Float
+Decimal = Integer
+
 module XmlSchemaMapper
   class Element
     attr_reader :xsd
+
+    delegate :name, :namespace, :type, to: :xsd
 
     def initialize(xsd_element, klass=nil)
       @xsd   = xsd_element
@@ -9,10 +15,12 @@ module XmlSchemaMapper
 
     def klass
       @klass ||= begin
-        klass_name = @xsd.type.name.underscore.classify
-        klass_name.safe_constantize || struct_for(klass_name)
-      rescue
-        nil
+        name = (klass_name || base_klass_name)
+        name ? (name+"Mapper").constantize : XmlSchemaMapper.default_class
+      rescue NameError
+        name.constantize
+      rescue NameError => e
+        raise e, "NotImplimented type #{name.inspect}"
       end
     end
 
@@ -23,8 +31,9 @@ module XmlSchemaMapper
       ].include? @xsd.type.kind
     end
 
-    def name
-      @xsd.name
+    def content_from(object)
+      data = object.send(reader)
+      data.respond_to?(:to_xml) ? data.to_xml : data
     end
 
     def method_name
@@ -40,7 +49,7 @@ module XmlSchemaMapper
     end
 
     def xpath(xml)
-      if @xsd.namespace
+      if namespace
         xml.at_xpath("./foo:#{name}", { 'foo' => @xsd.namespace })
       else
         xml.at_xpath("./#{name}")
@@ -51,8 +60,19 @@ module XmlSchemaMapper
       @xsd.elements.keys.map(&:to_sym)
     end
 
-    def struct_for(klass_name)
-      Struct.new(klass_name, *elements)
+    private
+
+    def klass_name
+      @xsd.type.name.camelize
+    rescue NameError
+      nil
     end
+
+    def base_klass_name
+      @xsd.base.name.camelize
+    rescue NameError
+      nil
+    end
+
   end
 end

@@ -1,71 +1,105 @@
+class NoToXmlError < NoMethodError
+end
+
 module XmlSchemaMapper
   class Builder
-    attr_reader :source, :namespaces
 
-    def initialize(source)
-      @source     = source
-      @klass      = source.class
-      @namespaces = @klass._schema.namespaces.inject({ }) { |hash, ns| hash.merge ns.prefix => ns.href }
+    attr_reader :document, :parent
+
+    delegate :elements, :to => :@klass
+
+    def initialize(source, parent)
+      @parent   = parent.is_a?(Nokogiri::XML::Document) ? parent.root : parent
+      @document = parent.document
+      @source   = source
+      @klass    = source.class
+      @schema   = @klass._schema
     end
 
     def build
       elements.each do |element|
-        node = create_element(element)
-        add_node node, element.xsd.namespace
+        add_element_namespace_to_root!(element)
+        node = create_node(element)
+        parent << node unless node.content.blank?
       end
-      document.root
+      self
     end
 
-    def elements
-      @klass.elements
+    def clean!
+
     end
 
-    def add_node(node, namespace)
-      document.root << node
-      if namespace
-        node.namespace = find_namespace_definition(namespace)
+    private
+
+    attr_reader :source, :schema
+
+    def create_node(element)
+      setup_namespace(element) do
+        element.simple? ? simple_node(element) : complex_node(element)
       end
     end
 
-    def find_namespace_definition(namespace)
-      document.root.namespace_scopes.find { |n| n.href == namespace }
+    def setup_namespace(element)
+      yield.tap do |node|
+        return if node.nil?
+        node.namespace = find_namespace_definition(element.namespace)
+      end
     end
 
-    def create_element(element)
-      if element.simple?
-        create_simple(element)
+    def simple_node(element)
+      document.create_element(element.name, element.content_from(source))
+    end
+
+    def complex_node(element)
+      object            = source.send(element.reader)
+      complex_root_node = document.create_element(element.name)
+
+      if object.is_a?(XmlSchemaMapper)
+        complex_node_from_mapper(complex_root_node, object)
       else
-        create_complex(element)
+        complex_node_from_xml(complex_root_node, object)
       end
+    rescue NoToXmlError
+      raise("object of #{source.class}##{element.reader} should respond to :to_xml")
     end
 
-    def create_simple(element)
-      document.create_element(element.name, value(element))
-    end
-
-    def create_complex(element)
-      child = source.send(element.reader)
-      if child.is_a?(XmlSchemaMapper)
-        child.xml_document.root
+    def complex_node_from_xml(root, object)
+      return root if object.nil?
+      if object.respond_to?(:to_xml)
+        root << object.to_xml
       else
-        child.to_xml
+        raise NoToXmlError
       end
     end
 
-    def value(element)
-      data = source.send(element.reader)
-      data.respond_to?(:to_xml) ? data.to_xml : data
+    def complex_node_from_mapper(root, object)
+      XmlSchemaMapper::Builder.build(object, root).parent
     end
 
-    def document
-      @document ||= begin
-        d      = Nokogiri::XML::Document.new
-        d.root = d.create_element(@klass._type.name.camelize(:lower))
-        @namespaces.each do |prefix, href|
-          d.root.add_namespace(prefix, href)
-        end
-        d
+    def add_element_namespace_to_root!(element)
+      if element.namespace
+        ns = schema.namespaces.find_by_href(element.namespace)
+        raise "prefix for namespace #{element.namespace.inspect} not found" unless ns
+
+        document.root.add_namespace(ns.prefix, ns.href)
       end
     end
+
+    def find_namespace_definition(href)
+      document.root.namespace_definitions.find { |ns| ns.href == href }
+    end
+
+    # CLASS_METHODS
+
+    def self.create_document(xtype)
+      Nokogiri::XML::Document.new.tap do |doc|
+        doc.root = doc.create_element(xtype.name.camelize(:lower))
+      end
+    end
+
+    def self.build(mapper, parent)
+      XmlSchemaMapper::Builder.new(mapper, parent).build
+    end
+
   end
 end

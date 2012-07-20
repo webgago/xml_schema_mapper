@@ -1,4 +1,4 @@
-<getFirstName xmlns:cm="http://example.com/common/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://example.com/UserService/type/">
+<getFirstName xmlns:tns="http://example.com/UserService/type/" xmlns:cm="http://example.com/common/">
   <userIdentifier>001</userIdentifier>
   <tns:filter>
     <tns:age>50</tns:age>

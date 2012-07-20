@@ -1,0 +1,13 @@
+<%- if options[:module_name].present? -%>
+class <%= options[:module_name] %>::<%= name.camelize %>Converter
+<% else -%>
+class <%= name.camelize %>Converter
+<% end -%>
+  include ModelConverter
+
+  converter do
+  <%-  attributes.each do |attr| -%>
+    convert_attr :<%= attr.underscore %>
+  <%- end %>
+  end
+end

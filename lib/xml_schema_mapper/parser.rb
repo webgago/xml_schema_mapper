@@ -1,7 +1,5 @@
 module XmlSchemaMapper
   class Parser
-    attr_reader :xml
-
     def initialize(klass)
       @klass = klass
     end
@@ -11,12 +9,17 @@ module XmlSchemaMapper
       xml = document(xml)
       @klass.elements.each do |e|
         if e.simple?
-          instance.send(e.writer, e.xpath(xml).inner_text)
+          instance.send(e.writer, content_for(e, xml))
         else
           instance.send(e.writer, e.klass.parse(e.xpath(xml)))
         end
       end
       instance
+    end
+
+    def content_for(element, xml)
+      node = element.xpath(xml)
+      node.content if node
     end
 
     def document(xml)

@@ -3,7 +3,7 @@
            xmlns:com="http://example.com/common/"
            targetNamespace="http://example.com/UserService/type/" version="1.0">
 
-  <xs:import namespace="http://example.com/common/" schemaLocation="common.xsd"/>
+ <xs:import namespace="http://example.com/common/" schemaLocation="common.xsd"/>
 
   <xs:complexType name="Filter">
     <xs:sequence>

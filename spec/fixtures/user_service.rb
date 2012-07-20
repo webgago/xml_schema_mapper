@@ -1,3 +1,9 @@
+class ZONE
+  include XmlSchemaMapper
+  schema 'spec/fixtures/UserService.xsd'
+  type 'ZONE'
+end
+
 class Filter
   include XmlSchemaMapper
   schema 'spec/fixtures/UserService.xsd'
@@ -15,4 +21,3 @@ class GetFirstName
   schema 'spec/fixtures/UserService.xsd'
   type 'GetFirstName'
 end
-

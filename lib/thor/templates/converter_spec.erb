@@ -1,0 +1,11 @@
+require 'spec_helper'
+
+<%- if options[:module_name].present? -%>
+describe <%= options[:module_name] %>::<%= name.camelize %> do
+<% else -%>
+describe <%= name.camelize %> do
+<% end -%>
+  it { should be_a XmlSchemaMapper }
+  it { _schema.should be_a LibXML::XML::Schema }
+  it { _type.name.should eql '<%= name %>' }
+end
