@@ -37,15 +37,15 @@ module XmlSchemaMapper
     end
 
     def method_name
-      name.underscore
+      name.underscore.to_sym
     end
 
     def writer
-      "#{method_name}="
+      :"#{method_name}="
     end
 
     def reader
-      "#{method_name}"
+      method_name
     end
 
     def xpath(xml)
@@ -58,6 +58,13 @@ module XmlSchemaMapper
 
     def elements
       @xsd.elements.keys.map(&:to_sym)
+    end
+
+    def converter_class
+     (type.name + "Converter").constantize
+    end
+    def mapper_class
+     (type.name + "Mapper").constantize
     end
 
     private
