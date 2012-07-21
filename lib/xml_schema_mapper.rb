@@ -38,11 +38,7 @@ module XmlSchemaMapper
       _type.elements.values.each do |element|
         e = XmlSchemaMapper::Element.new(element)
         elements << e
-        begin
-          attr_accessor e.method_name
-        rescue
-          raise [e.method_name, e.klass, e.type.name].inspect
-        end
+        attr_accessor e.method_name
       end
     end
 
@@ -64,8 +60,8 @@ module XmlSchemaMapper
     elements.map(&:name)
   end
 
-  def to_xml(options = {})
-    xml_document.root.to_xml({:encoding => 'UTF-8'}.merge(options))
+  def to_xml(options = { })
+    xml_document.root.to_xml({ :encoding => 'UTF-8' }.merge(options))
   end
 
   def xml_document

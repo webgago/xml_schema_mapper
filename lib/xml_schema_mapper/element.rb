@@ -6,7 +6,7 @@ module XmlSchemaMapper
   class Element
     attr_reader :xsd
 
-    delegate :name, :namespace, :type, to: :xsd
+    delegate :name, :namespace, :type, :base, to: :xsd
 
     def initialize(xsd_element, klass=nil)
       @xsd   = xsd_element
@@ -61,22 +61,22 @@ module XmlSchemaMapper
     end
 
     def converter_class
-     (type.name + "Converter").constantize
+     (klass_name + "Converter").constantize
     end
     def mapper_class
-     (type.name + "Mapper").constantize
+     (klass_name + "Mapper").constantize
     end
 
     private
 
     def klass_name
-      @xsd.type.name.camelize
+      type.name.camelize
     rescue NameError
       nil
     end
 
     def base_klass_name
-      @xsd.base.name.camelize
+      base.name.camelize
     rescue NameError
       nil
     end
