@@ -4,19 +4,13 @@ require "thor/group"
 module XsdMappers
   class CLI < Thor
 
-    desc 'mappers path/to/xsd path/to/generate/classes', 'generate classes for xsd types'
+    desc 'generate path/to/xsd', 'generate mappers for xsd types'
     method_option :module_name, default: ''
-    def mappers(schema_path, destination = './')
-      schema(schema_path).types.each do |name, type|
-        Mappers.new([name, schema_path, destination]).invoke_all
-      end
-    end
-
-    desc 'converters path/to/xsd path/to/generate/classes', 'generate converters for xsd types'
-    method_option :module_name, default: ''
-    def converters(schema_path, destination = './')
-      schema(schema_path).types.each do |name, type|
-        Converters.new([name, schema_path, destination], options.merge(attributes: type.elements.keys)).invoke_all
+    method_option :'skip-converters', type: :boolean
+    def generate(schema_path)
+      schema(schema_path).types.each do |name, _|
+        Mappers.new([name, schema_path]).invoke_all
+        Converters.new([name, schema_path]).invoke_all unless options[:'skip-converters']
       end
     end
 
@@ -34,7 +28,6 @@ module XsdMappers
     # Define arguments and options
     argument :name
     argument :schema_path
-    argument :destination, default: './'
     class_option :module_name, default: ''
     class_option :override, default: false
     class_option :base_type, default: nil
@@ -45,13 +38,13 @@ module XsdMappers
     end
 
     def create_lib_file
-      template('templates/mapper_class.erb', "app/#{destination}/#{name.underscore}_mapper.rb")
+      template('templates/mapper_class.erb', "app/mappers/#{name.underscore}_mapper.rb")
     end
 
     def create_test_file
       test = options[:test_framework] == "test" ? :test : :spec
       with_padding do
-        template 'templates/mapper_spec.erb', "spec/#{destination}/#{name.underscore}_mapper_#{test}.rb"
+        template 'templates/mapper_spec.erb', "spec/mappers/#{name.underscore}_mapper_#{test}.rb"
       end
     end
 
@@ -78,13 +71,13 @@ module XsdMappers
     class_option :force, default: false
 
     def create_lib_file
-      template('templates/converter_class.erb', "app/#{destination}/#{name.underscore}_converter.rb")
+      template('templates/converter_class.erb', "app/converters/#{name.underscore}_converter.rb")
     end
 
     def create_test_file
       test = options[:test_framework] == "test" ? :test : :spec
       with_padding do
-        template 'templates/converter_spec.erb', "spec/#{destination}/#{name.underscore}_converter_#{test}.rb"
+        template 'templates/converter_spec.erb', "spec/converters/#{name.underscore}_converter_#{test}.rb"
       end
     end
   end

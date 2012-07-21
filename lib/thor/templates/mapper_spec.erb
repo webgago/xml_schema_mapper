@@ -8,9 +8,8 @@
 require 'spec_helper'
 
 <%- if options[:module_name].present? -%>
-describe <%= options[:module_name] %>::<%= name.camelize %> do
+describe <%= options[:module_name] %>::<%= name.camelize %>Mapper do
 <% else -%>
-describe <%= name.camelize %> do
+describe <%= name.camelize %>Mapper do
 <% end -%>
-  it { should be_a ModelConverter }
 end

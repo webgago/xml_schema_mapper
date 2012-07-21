@@ -2,7 +2,7 @@
 # @note <%= type.annotation.to_s.gsub("\n", "\n# ") %>
 
 <%-  elements.each do |element| -%>
-# @attr <%= element.name %> [<%= element.type.name %>] <%= element.annotation || element.type.annotation %>
+# @attr <%= element.name %> [<%= element.type.name %>] <%= (element.annotation || element.type.annotation).to_s.gsub("\n", "\n# ") %>
 <%- end -%>
 
 <%- if options[:module_name].present? -%>
@@ -13,4 +13,9 @@ class <%= name.camelize %>Mapper
   include XmlSchemaMapper
   schema '<%= schema_path %>'
   type '<%= name %>'
+
+<%-  elements.each do |element| -%>
+  # @attr [<%= element.type.name %>] <%= (element.annotation || element.type.annotation).to_s.gsub("\n", "\n# ") %>
+  attr_accessor :<%= element.name.underscore %>
+<%- end -%>
 end
