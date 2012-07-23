@@ -49,8 +49,9 @@ module XsdMappers
     end
 
     protected
-    def attributes
-      options[:attributes]
+
+    def subclasses
+      type.annonymus_subtypes_recursively.inject({}, &:merge)
     end
 
     def schema

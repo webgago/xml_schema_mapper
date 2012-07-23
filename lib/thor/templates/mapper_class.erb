@@ -14,8 +14,23 @@ class <%= name.camelize %>Mapper
   schema '<%= schema_path %>'
   type '<%= name %>'
 
-<%-  elements.each do |element| -%>
-  # @attr [<%= element.type.name %>] <%= (element.annotation || element.type.annotation).to_s.gsub("\n", "\n# ") %>
+<% elements.each do |element| %>
+  # @attr [<%= element.type.name || "annonymus subclass: #{element.name}" %>] <%= (element.annotation || element.type.annotation).to_s.gsub("\n", "\n# ") %>
   attr_accessor :<%= element.name.underscore %>
 <%- end -%>
+
+<% unless subclasses.empty? -%>
+  <% subclasses.each do |subclass, type| %>
+  class <%= subclass %>
+    include XmlSchemaMapper
+    schema '<%= schema_path %>'
+    annonymus_type '<%= [name.camelize, subclass].join('::') %>'
+
+    <%  type.elements.values.each do |element| %>
+    # @attr [<%= element.type.name || "annonymus subclass: #{element.name}" %>] <%= (element.annotation || element.type.annotation).to_s.gsub("\n", "\n# ") %>
+    attr_accessor :<%= element.name.underscore %>
+    <%- end -%>
+  end
+  <% end %>
+<% end -%>
 end

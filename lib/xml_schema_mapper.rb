@@ -34,6 +34,16 @@ module XmlSchemaMapper
       define_elements!
     end
 
+    def annonymus_type(name)
+      raise(%Q{call "schema 'path/to/your/File.xsd'" before calling "type"}) unless _schema
+      path = name.split('::')
+      type = _schema.types[path.shift]
+      self._type = path.map do |n|
+        type = type.elements[n].type
+      end.last
+      define_elements!
+    end
+
     def define_elements!
       _type.elements.values.each do |element|
         e = XmlSchemaMapper::Element.new(element)
