@@ -4,6 +4,7 @@ require "nokogiri"
 require "active_support/concern"
 require "active_support/core_ext/class"
 require "active_support/core_ext/module/delegation"
+require "active_support/core_ext/object/blank"
 require "virtus"
 
 require "xml_schema_mapper/element"
@@ -80,4 +81,5 @@ module XmlSchemaMapper
     builder.build
     builder.document
   end
+
 end

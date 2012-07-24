@@ -3,7 +3,7 @@ require "spec_helper"
 describe XmlSchemaMapper do
 
   context "valid mapping" do
-    subject { GetFirstName.new }
+    subject { GetFirstNameMapper.new }
 
     it "should be XmlSchemaMapper" do
       subject.should be_a XmlSchemaMapper

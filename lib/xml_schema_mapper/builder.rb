@@ -25,10 +25,6 @@ module XmlSchemaMapper
       self
     end
 
-    def clean!
-
-    end
-
     private
 
     attr_reader :source, :schema

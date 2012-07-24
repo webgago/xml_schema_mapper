@@ -7,6 +7,7 @@ module XsdMappers
     desc 'generate path/to/xsd', 'generate mappers for xsd types'
     method_option :module_name, default: ''
     method_option :'skip-converters', type: :boolean
+
     def generate(schema_path)
       schema(schema_path).types.each do |name, _|
         Mappers.new([name, schema_path]).invoke_all
@@ -51,7 +52,7 @@ module XsdMappers
     protected
 
     def subclasses
-      type.annonymus_subtypes_recursively.inject({}, &:merge)
+      type.annonymus_subtypes_recursively.inject({ }, &:merge)
     end
 
     def schema
@@ -65,11 +66,23 @@ module XsdMappers
     def type
       @type ||= schema.types[name]
     end
+
+    def element_annotation(element)
+      type    = element.type.name || "annonymus subclass: #{element.name}"
+      comment = (element.annotation || element.type.annotation).to_s.gsub("\n", "\n# ")
+      "# @attr [#{type}] #{comment}"
+    end
+
+    def mapper_name
+      class_name = "#{name.camelize}Mapper"
+      options[:module_name].present? ? "#{options[:module_name]}::#{class_name}" : class_name
+    end
   end
 
   class Converters < Mappers
     class_option :attributes, type: :array
     class_option :force, default: false
+    class_option :skip, default: true
 
     def create_lib_file
       template('templates/converter_class.erb', "app/converters/#{name.underscore}_converter.rb")

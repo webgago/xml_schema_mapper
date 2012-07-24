@@ -1,23 +1,19 @@
 # encoding: utf-8
 # @note <%= type.annotation.to_s.gsub("\n", "\n# ") %>
 
-<%-  elements.each do |element| -%>
-# @attr <%= element.name %> [<%= element.type.name %>] <%= (element.annotation || element.type.annotation).to_s.gsub("\n", "\n# ") %>
+<% elements.each do |element| %>
+<%= element_annotation(element) %>
 <%- end -%>
 
-<%- if options[:module_name].present? -%>
-class <%= options[:module_name] %>::<%= name.camelize %>Mapper
-<% else -%>
-class <%= name.camelize %>Mapper
-<% end -%>
+class <%= mapper_name %>
   include XmlSchemaMapper
   schema '<%= schema_path %>'
   type '<%= name %>'
 
 <% elements.each do |element| %>
-  # @attr [<%= element.type.name || "annonymus subclass: #{element.name}" %>] <%= (element.annotation || element.type.annotation).to_s.gsub("\n", "\n# ") %>
+  <%= element_annotation(element) %>
   attr_accessor :<%= element.name.underscore %>
-<%- end -%>
+<% end %>
 
 <% unless subclasses.empty? -%>
   <% subclasses.each do |subclass, type| %>
@@ -27,7 +23,7 @@ class <%= name.camelize %>Mapper
     annonymus_type '<%= [name.camelize, subclass].join('::') %>'
 
     <%  type.elements.values.each do |element| %>
-    # @attr [<%= element.type.name || "annonymus subclass: #{element.name}" %>] <%= (element.annotation || element.type.annotation).to_s.gsub("\n", "\n# ") %>
+    <%= element_annotation(element) %>
     attr_accessor :<%= element.name.underscore %>
     <%- end -%>
   end

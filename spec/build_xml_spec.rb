@@ -7,15 +7,15 @@ describe "Build XML" do
 
     context "valid data" do
       let(:object) do
-        o     = Options.new
+        o     = OptionsMapper.new
         o.one = 'one'
         o.two = 'two'
 
-        f        = Filter.new
+        f        = FilterMapper.new
         f.age    = 50
         f.gender = 'male'
 
-        g                 = GetFirstName.new
+        g                 = GetFirstNameMapper.new
         g.user_identifier = '001'
         g.is_out          = 'a'
         g.zone            = 'b'

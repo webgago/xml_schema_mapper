@@ -1,10 +1,10 @@
 require "spec_helper"
 
 describe XmlSchemaMapper::Builder do
-  let(:options) { o = Options.new; o.one = 'one'; o.two = 'two'; o }
+  let(:options) { o = OptionsMapper.new; o.one = 'one'; o.two = 'two'; o }
   let(:object) do
-    f = Filter.new; f.age = 50; f.gender = 'male'
-    g = GetFirstName.new; g.user_identifier = '001'; g.is_out = 'a'; g.zone = 'b'; g.filter = f; g.options = options
+    f = FilterMapper.new; f.age = 50; f.gender = 'male'
+    g = GetFirstNameMapper.new; g.user_identifier = '001'; g.is_out = 'a'; g.zone = 'b'; g.filter = f; g.options = options
     g
   end
 
@@ -119,7 +119,7 @@ describe XmlSchemaMapper::Builder do
       complex_element.stub(namespace: nil, reader: 'not_a_mapper')
       subject.stub(elements: [complex_element])
 
-      expect { subject.build }.to raise_error("object of GetFirstName#not_a_mapper should respond to :to_xml")
+      expect { subject.build }.to raise_error("object of GetFirstNameMapper#not_a_mapper should respond to :to_xml")
     end
 
   end
