@@ -6,12 +6,13 @@ module XsdMappers
 
     desc 'generate path/to/xsd', 'generate mappers for xsd types'
     method_option :module_name, default: ''
+    method_option :converter_module_name, default: ''
     method_option :'skip-converters', type: :boolean
 
     def generate(schema_path)
       schema(schema_path).types.each do |name, _|
-        Mappers.new([name, schema_path]).invoke_all
-        Converters.new([name, schema_path]).invoke_all unless options[:'skip-converters']
+        Mappers.new([name, schema_path], options).invoke_all
+        Converters.new([name, schema_path], options).invoke_all unless options[:'skip-converters']
       end
     end
 
@@ -38,14 +39,20 @@ module XsdMappers
       File.dirname(__FILE__)
     end
 
+    def module_path
+      options[:module_name] ? options[:module_name].underscore : ""
+    end
+
     def create_lib_file
-      template('templates/mapper_class.erb', "app/mappers/#{name.underscore}_mapper.rb")
+      filename = "#{name.underscore}_mapper.rb"
+      template('templates/mapper_class.erb', File.join('app/mappers/', module_path, filename))
     end
 
     def create_test_file
-      test = options[:test_framework] == "test" ? :test : :spec
+      test     = options[:test_framework] == "test" ? :test : :spec
+      filename = "#{name.underscore}_mapper_#{test}.rb"
       with_padding do
-        template 'templates/mapper_spec.erb', "spec/mappers/#{name.underscore}_mapper_#{test}.rb"
+        template 'templates/mapper_spec.erb', File.join("#{test}/mappers/", module_path, filename)
       end
     end
 
@@ -69,8 +76,8 @@ module XsdMappers
 
     def element_annotation(element)
       type    = element.type.name || "annonymus subclass: #{element.name}"
-      comment = (element.annotation || element.type.annotation).to_s.gsub("\n", "\n# ")
-      "# @attr [#{type}] #{comment}"
+      comment = element.annotation || element.type.annotation
+      "@attr [#{type}] #{comment}"
     end
 
     def mapper_name
@@ -81,17 +88,24 @@ module XsdMappers
 
   class Converters < Mappers
     class_option :attributes, type: :array
+    class_option :converter_module_name, default: ""
     class_option :force, default: false
     class_option :skip, default: true
 
+    def module_path
+      options[:converter_module_name] ? options[:converter_module_name].underscore : ""
+    end
+
     def create_lib_file
-      template('templates/converter_class.erb', "app/converters/#{name.underscore}_converter.rb")
+      filename = "#{name.underscore}_converter.rb"
+      template('templates/converter_class.erb', File.join('app/converters/', module_path, filename))
     end
 
     def create_test_file
-      test = options[:test_framework] == "test" ? :test : :spec
+      test     = options[:test_framework] == "test" ? :test : :spec
+      filename = "#{name.underscore}_converter_#{test}.rb"
       with_padding do
-        template 'templates/converter_spec.erb', "spec/converters/#{name.underscore}_converter_#{test}.rb"
+        template 'templates/converter_spec.erb', File.join("#{test}/converters/", module_path, filename)
       end
     end
   end

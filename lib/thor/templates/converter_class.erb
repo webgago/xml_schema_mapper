@@ -5,8 +5,8 @@
 # @attr <%= element.name %> [<%= element.type.name %>] <%= element.annotation || element.type.annotation %>
 <%- end -%>
 
-<%- if options[:module_name].present? -%>
-class <%= options[:module_name] %>::<%= name.camelize %>Converter < Converter
+<%- if options[:converter_module_name].present? -%>
+class <%= options[:converter_module_name] %>::<%= name.camelize %>Converter < Converter
 <% else -%>
 class <%= name.camelize %>Converter < Converter
 <% end -%>

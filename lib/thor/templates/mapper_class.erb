@@ -1,8 +1,9 @@
 # encoding: utf-8
 # @note <%= type.annotation.to_s.gsub("\n", "\n# ") %>
-
-<% elements.each do |element| %>
-<%= element_annotation(element) %>
+<%- elements.each do |element| -%>
+<%- element_annotation(element).split("\n").delete_if(&:blank?).each do |comment| -%>
+# <%= comment %>
+<%- end -%>
 <%- end -%>
 
 class <%= mapper_name %>
@@ -10,23 +11,26 @@ class <%= mapper_name %>
   schema '<%= schema_path %>'
   type '<%= name %>'
 
-<% elements.each do |element| %>
-  <%= element_annotation(element) %>
+<%- elements.each do |element| -%>
+  <%- element_annotation(element).split("\n").delete_if(&:blank?).each do |comment| -%>
+  # <%= comment %>
+  <%- end -%>
   attr_accessor :<%= element.name.underscore %>
-<% end %>
+<%- end -%>
 
-<% unless subclasses.empty? -%>
-  <% subclasses.each do |subclass, type| %>
+<%- subclasses.each do |subclass, type| -%>
   class <%= subclass %>
     include XmlSchemaMapper
     schema '<%= schema_path %>'
     annonymus_type '<%= [name.camelize, subclass].join('::') %>'
 
-    <%  type.elements.values.each do |element| %>
-    <%= element_annotation(element) %>
-    attr_accessor :<%= element.name.underscore %>
+  <%- type.elements.values.each do |element| -%>
+    <%- element_annotation(element).split("\n").delete_if(&:blank?).each do |comment| -%>
+    # <%= comment %>
     <%- end -%>
+    attr_accessor :<%= element.name.underscore %>
+  <%- end -%>
   end
-  <% end %>
-<% end -%>
+
+<%- end  unless subclasses.empty? -%>
 end
