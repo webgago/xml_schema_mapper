@@ -5,6 +5,7 @@ require "active_support/concern"
 require "active_support/core_ext/class"
 require "active_support/core_ext/module/delegation"
 require "active_support/core_ext/object/blank"
+require "active_support/core_ext/string/inflections"
 require "virtus"
 
 require "xml_schema_mapper/element"
@@ -13,8 +14,6 @@ require "xml_schema_mapper/builder"
 
 module XmlSchemaMapper
   extend ActiveSupport::Concern
-  mattr_accessor :default_class
-  self.default_class = String
 
   included do
     class_attribute :_schema

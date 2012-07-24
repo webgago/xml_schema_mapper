@@ -8,27 +8,15 @@ module XmlSchemaMapper
 
     delegate :name, :namespace, :type, :base, to: :xsd
 
-    def initialize(xsd_element, klass=nil)
-      @xsd   = xsd_element
-      @klass = klass
-    end
-
-    def klass
-      @klass ||= begin
-        name = (klass_name || base_klass_name)
-        name ? (name+"Mapper").constantize : XmlSchemaMapper.default_class
-      rescue NameError
-        name.constantize
-      rescue NameError => e
-        raise e, "NotImplimented type #{name.inspect}"
-      end
+    def initialize(xsd_element)
+      @xsd = xsd_element
     end
 
     def simple?
       [
           LibXML::XML::Schema::Types::XML_SCHEMA_TYPE_SIMPLE,
           LibXML::XML::Schema::Types::XML_SCHEMA_TYPE_BASIC
-      ].include? @xsd.type.kind
+      ].include? type.kind
     end
 
     def content_from(object)
@@ -56,28 +44,27 @@ module XmlSchemaMapper
       end
     end
 
-    def elements
-      @xsd.elements.keys.map(&:to_sym)
-    end
-
     def converter_class
-     (klass_name + "Converter").constantize
-    end
-    def mapper_class
-     (klass_name + "Mapper").constantize
+      (klass_name + "Converter").constantize
     end
 
-    private
+    def mapper_class
+      mapper_class_name.constantize
+    end
+
+    def mapper_class_name
+      klass_name + "Mapper"
+    end
 
     def klass_name
       type.name.camelize
-    rescue NameError
+    rescue NoMethodError
       nil
     end
 
     def base_klass_name
       base.name.camelize
-    rescue NameError
+    rescue NoMethodError
       nil
     end
 
