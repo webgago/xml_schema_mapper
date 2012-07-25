@@ -14,7 +14,7 @@ describe XmlSchemaMapper do
     its(:'_type.name') { should eql 'GetFirstName' }
     its(:'_type.namespace') { should eql 'http://example.com/UserService/type/' }
 
-    its(:element_names) { should eql %w(userIdentifier filter isOut zone options) }
+    its(:element_names) { should eql [:user_identifier, :filter, :is_out, :zone, :options] }
   end
 
   context "not valid mapping" do

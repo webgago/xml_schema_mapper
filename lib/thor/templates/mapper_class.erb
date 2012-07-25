@@ -1,9 +1,6 @@
 # encoding: utf-8
+<%- unless type.annotation.to_s.blank? -%>
 # @note <%= type.annotation.to_s.gsub("\n", "\n# ") %>
-<%- elements.each do |element| -%>
-<%- element_annotation(element).split("\n").delete_if(&:blank?).each do |comment| -%>
-# <%= comment %>
-<%- end -%>
 <%- end -%>
 
 class <%= mapper_name %>
@@ -32,5 +29,5 @@ class <%= mapper_name %>
   <%- end -%>
   end
 
-<%- end  unless subclasses.empty? -%>
+<%- end unless subclasses.empty? -%>
 end

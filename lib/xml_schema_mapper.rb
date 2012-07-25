@@ -18,38 +18,34 @@ module XmlSchemaMapper
   included do
     class_attribute :_schema
     class_attribute :_type
-    class_attribute :elements
-    self.elements = []
     include Virtus
   end
 
   module ClassMethods
-    def schema(location)
-      self._schema = LibXML::XML::Schema.cached(location)
+    def schema(location=nil)
+      if location
+        self._schema = LibXML::XML::Schema.cached(location)
+      else
+        self._schema
+      end
     end
 
-    def type(name)
+    def type(name=nil)
       raise(%Q{call "schema 'path/to/your/File.xsd'" before calling "type"}) unless _schema
-      self._type = _schema.types[name]
-      define_elements!
+      if name
+        self._type = _schema.types[name]
+      else
+        self._type
+      end
     end
 
     def annonymus_type(name)
       raise(%Q{call "schema 'path/to/your/File.xsd'" before calling "type"}) unless _schema
-      path = name.split('::')
-      type = _schema.types[path.shift]
+      path       = name.split('::')
+      type       = _schema.types[path.shift]
       self._type = path.map do |n|
         type = type.elements[n].type
       end.last
-      define_elements!
-    end
-
-    def define_elements!
-      _type.elements.values.each do |element|
-        e = XmlSchemaMapper::Element.new(element)
-        elements << e
-        attr_accessor e.method_name
-      end
     end
 
     def parse(string_or_node)
@@ -64,10 +60,43 @@ module XmlSchemaMapper
         raise(ArgumentError, "param must be a String or Nokogiri::XML::Node, but \"#{string_or_node.inspect}\" given")
       end
     end
+
+    def elements
+      @elements ||= type.elements.values.map do |element|
+        XmlSchemaMapper::Element.new(element)
+      end
+    end
+
+  end
+
+  def accept(visitor, *args)
+    visitor.visit(self, *args)
+  end
+
+  def simple?
+    type.simple?
+  end
+
+  def values
+    type.facets.map &:value
+  end
+
+  def type
+    self.class.type
+  end
+
+  def schema
+    self.class.schema
   end
 
   def element_names
-    elements.map(&:name)
+    elements.keys
+  end
+
+  def elements
+    type.elements.values.inject({ }) do |hash, element|
+      hash.merge element.name.underscore.to_sym => send(element.name.underscore.to_sym)
+    end
   end
 
   def to_xml(options = { })
@@ -75,10 +104,19 @@ module XmlSchemaMapper
   end
 
   def xml_document
-    document = XmlSchemaMapper::Builder.create_document(_type)
-    builder  = XmlSchemaMapper::Builder.new(self, document.root)
+    document = XmlSchemaMapper::Builder.create_document(type)
+    if global_element
+      ns = schema.namespaces.find_by_href(global_element.namespace)
+      document.root.namespace = document.root.add_namespace_definition(ns.prefix, ns.href)
+    end
+
+    builder = XmlSchemaMapper::Builder.new(self, document.root)
     builder.build
     builder.document
+  end
+
+  def global_element
+    schema.elements.values.find { |e| e.type.name == type.name }
   end
 
 end

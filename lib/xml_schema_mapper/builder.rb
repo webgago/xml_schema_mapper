@@ -6,8 +6,6 @@ module XmlSchemaMapper
 
     attr_reader :document, :parent
 
-    delegate :elements, :to => :@klass
-
     def initialize(source, parent)
       @parent   = parent.is_a?(Nokogiri::XML::Document) ? parent.root : parent
       @document = parent.document
@@ -16,11 +14,16 @@ module XmlSchemaMapper
       @schema   = @klass._schema
     end
 
+    def elements
+      @klass.type.elements.values.map { |e| XmlSchemaMapper::Element.new e }
+    end
+
     def build
       elements.each do |element|
         add_element_namespace_to_root!(element)
         node = create_node(element)
         parent << node unless node.content.blank?
+        node.namespace = nil if element.namespace.nil?
       end
       self
     end

@@ -36,14 +36,6 @@ module XmlSchemaMapper
       method_name
     end
 
-    def xpath(xml)
-      if namespace
-        xml.at_xpath("./foo:#{name}", { 'foo' => @xsd.namespace })
-      else
-        xml.at_xpath("./#{name}")
-      end
-    end
-
     def converter_class
       (klass_name + "Converter").constantize
     end
@@ -57,9 +49,11 @@ module XmlSchemaMapper
     end
 
     def klass_name
-      type.name.camelize
-    rescue NoMethodError
-      nil
+      if type.name.nil?
+        name.camelize
+      else
+        type.name.camelize
+      end
     end
 
     def base_klass_name

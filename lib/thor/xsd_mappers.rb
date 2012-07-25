@@ -75,14 +75,27 @@ module XsdMappers
     end
 
     def element_annotation(element)
-      type    = element.type.name || "annonymus subclass: #{element.name}"
+      type    = element.type.name || "#{element.name}"
       comment = element.annotation || element.type.annotation
-      "@attr [#{type}] #{comment}"
+      if  [LibXML::XML::Schema::Types::XML_SCHEMA_TYPE_SIMPLE,
+           LibXML::XML::Schema::Types::XML_SCHEMA_TYPE_BASIC].include?(element.type.kind)
+        "@return [#{type.camelize}] #{comment}"
+      else
+        "@return [#{module_name}#{type.camelize}Mapper] #{comment}"
+      end
+    end
+
+    def module_name
+      if options[:module_name].presence
+        "#{options[:module_name]}::"
+      else
+        ""
+      end
     end
 
     def mapper_name
       class_name = "#{name.camelize}Mapper"
-      options[:module_name].present? ? "#{options[:module_name]}::#{class_name}" : class_name
+      "#{module_name}#{class_name}"
     end
   end
 
