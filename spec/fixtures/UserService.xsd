@@ -3,7 +3,7 @@
            xmlns:com="http://example.com/common/"
            targetNamespace="http://example.com/UserService/type/" version="1.0">
 
- <xs:import namespace="http://example.com/common/" schemaLocation="common.xsd"/>
+  <xs:import namespace="http://example.com/common/" schemaLocation="common.xsd"/>
 
   <xs:complexType name="Filter">
     <xs:sequence>
@@ -43,6 +43,15 @@
     </xs:complexContent>
   </xs:complexType>
 
+  <xs:complexType name="ArrayOfGetFirstName">
+    <xs:annotation>
+      <xs:documentation>Array</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="query" type="tns:GetFirstName" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:element name="gender">
     <xs:simpleType>
       <xs:restriction base="xs:string">
@@ -63,5 +72,6 @@
 
   <xs:element name="filter" type="tns:Filter"/>
   <xs:element name="getFirstName" type="tns:GetFirstName"/>
+  <xs:element name="getFirstNames" type="tns:ArrayOfGetFirstName"/>
   <xs:element name="getLastName" type="tns:GetLastName"/>
 </xs:schema>

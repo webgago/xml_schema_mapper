@@ -62,6 +62,17 @@ describe "Parse XML" do
       its(:'options.one') { should eql 'p6E58' }
       its(:'options.two') { should eql 'Vm1sk87pkU0pE4EKKSY' }
     end
+
+
+    context "parse arrays" do
+      let(:xml) { File.read('spec/fixtures/instance_with_arrays.xml') }
+      subject { ArrayNamespace::ArrayOfGetFirstNameMapper.parse(xml) }
+
+      it do
+        subject.query.should have(2).elements
+        ArrayNamespace::ArrayOfGetFirstNameMapper.parse(subject.to_xml).query.should have(2).elements
+      end
+    end
   end
 
 end

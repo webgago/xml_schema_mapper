@@ -9,13 +9,35 @@ module XmlSchemaMapper
       instance = @klass.new
       xml      = document(xml)
       @klass.elements.each do |e|
-        if e.simple?
-          instance.send(e.writer, content_for(e, xml)) if instance.respond_to?(e.writer)
+        if e.array?
+          write_array_element(e, instance, xml)
         else
-          instance.send(e.writer, element_parser(e).parse(get_by_xpath(e, xml))) if instance.respond_to?(e.writer)
+          write_element(e, instance, xml)
         end
       end
       instance
+    end
+
+    def write_element(element, instance, xml)
+      node = get_node_by_xpath(element, xml)
+      if element.simple?
+        instance.send(element.writer, content_for(node)) if instance.respond_to?(element.writer)
+      else
+        instance.send(element.writer, element_parser(element).parse(node)) if instance.respond_to?(element.writer)
+      end
+    end
+
+    def write_array_element(element, instance, xml)
+      instance.send(element.writer, [])
+      if element.simple?
+        get_nodes_by_xpath(element, xml).each do |node|
+          instance.send(element.reader) << content_for(node) if instance.respond_to?(element.writer)
+        end
+      else
+        get_nodes_by_xpath(element, xml).each do |node|
+          instance.send(element.reader) << element_parser(element).parse(node) if instance.respond_to?(element.writer)
+        end
+      end
     end
 
     def element_parser(e)
@@ -28,16 +50,23 @@ module XmlSchemaMapper
           "#{e.klass_name}".constantize
     end
 
-    def content_for(element, xml)
-      node = get_by_xpath(element, xml)
+    def content_for(node)
       node.content if node
     end
 
-    def get_by_xpath(element, xml)
+    def get_node_by_xpath(element, xml)
       if element.namespace
         xml.at_xpath("./foo:#{element.name}", { 'foo' => element.namespace })
       else
         xml.at_xpath("./#{element.name}")
+      end
+    end
+
+    def get_nodes_by_xpath(element, xml)
+      if element.namespace
+        xml.xpath("./foo:#{element.name}", { 'foo' => element.namespace })
+      else
+        xml.xpath("./#{element.name}")
       end
     end
 

@@ -7,11 +7,11 @@ module XmlSchemaMapper
     attr_reader :document, :parent
 
     def initialize(source, parent)
-      @parent = parent.is_a?(Nokogiri::XML::Document) ? parent.root : parent
+      @parent   = parent.is_a?(Nokogiri::XML::Document) ? parent.root : parent
       @document = parent.document
-      @source = source
-      @klass = source.class
-      @schema = @klass._schema
+      @source   = source
+      @klass    = source.class
+      @schema   = @klass._schema
     end
 
     def elements
@@ -23,7 +23,12 @@ module XmlSchemaMapper
         add_element_namespace_to_root!(element)
         node = create_node(element)
         parent << node if node.is_a?(Nokogiri::XML::NodeSet) || node.content.present?
-        node.namespace = nil if element.namespace.nil?
+
+        if node.is_a?(Nokogiri::XML::NodeSet)
+          node.each { |n| n.namespace = nil if element.namespace.nil? }
+        else
+          node.namespace = nil if element.namespace.nil?
+        end
       end
       self
     end
@@ -41,11 +46,11 @@ module XmlSchemaMapper
     def setup_namespace(element)
       yield.tap do |node|
         case node
-          when Nokogiri::XML::NodeSet
-            node.each { |n| n.namespace = find_namespace_definition(element.namespace) }
-          when NilClass
-          else
-            node.namespace = find_namespace_definition(element.namespace)
+        when Nokogiri::XML::NodeSet
+          node.each { |n| n.namespace = find_namespace_definition(element.namespace) }
+        when NilClass
+        else
+          node.namespace = find_namespace_definition(element.namespace)
         end
       end
     end
@@ -55,7 +60,7 @@ module XmlSchemaMapper
     end
 
     def complex_node(element)
-      object = source.send(element.reader)
+      object            = source.send(element.reader)
       complex_root_node = document.create_element(element.name)
 
       complex_children(complex_root_node, object)
