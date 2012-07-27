@@ -6,7 +6,7 @@ module XmlSchemaMapper
   class Element
     attr_reader :xsd
 
-    delegate :name, :namespace, :type, :base, to: :xsd
+    delegate :name, :namespace, :type, :base, :array?, to: :xsd
 
     def initialize(xsd_element)
       @xsd = xsd_element
