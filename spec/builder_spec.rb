@@ -113,9 +113,17 @@ describe XmlSchemaMapper::Builder do
 
       subject.build
     end
+    it "if array build element for each" do
+      object.stub(array_mappers: [object.filter,object.filter])
+      complex_element.stub(namespace: 'http://example.com/common/', reader: 'array_mappers')
+      subject.stub(elements: [complex_element])
+
+      subject.parent.should_receive(:<<).with(instance_of(Nokogiri::XML::NodeSet))
+      subject.build
+    end
 
     it "should raise error when don't respond to :to_xml'" do
-      object.stub(not_a_mapper: [])
+      object.stub(not_a_mapper: 1)
       complex_element.stub(namespace: nil, reader: 'not_a_mapper')
       subject.stub(elements: [complex_element])
 

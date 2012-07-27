@@ -7,11 +7,11 @@ module XmlSchemaMapper
     attr_reader :document, :parent
 
     def initialize(source, parent)
-      @parent   = parent.is_a?(Nokogiri::XML::Document) ? parent.root : parent
+      @parent = parent.is_a?(Nokogiri::XML::Document) ? parent.root : parent
       @document = parent.document
-      @source   = source
-      @klass    = source.class
-      @schema   = @klass._schema
+      @source = source
+      @klass = source.class
+      @schema = @klass._schema
     end
 
     def elements
@@ -22,7 +22,7 @@ module XmlSchemaMapper
       elements.each do |element|
         add_element_namespace_to_root!(element)
         node = create_node(element)
-        parent << node unless node.content.blank?
+        parent << node if node.is_a?(Nokogiri::XML::NodeSet) || node.content.present?
         node.namespace = nil if element.namespace.nil?
       end
       self
@@ -40,8 +40,13 @@ module XmlSchemaMapper
 
     def setup_namespace(element)
       yield.tap do |node|
-        return if node.nil?
-        node.namespace = find_namespace_definition(element.namespace)
+        case node
+          when Nokogiri::XML::NodeSet
+            node.each { |n| n.namespace = find_namespace_definition(element.namespace) }
+          when NilClass
+          else
+            node.namespace = find_namespace_definition(element.namespace)
+        end
       end
     end
 
@@ -50,29 +55,39 @@ module XmlSchemaMapper
     end
 
     def complex_node(element)
-      object            = source.send(element.reader)
+      object = source.send(element.reader)
       complex_root_node = document.create_element(element.name)
 
+      complex_children(complex_root_node, object)
+    rescue NoToXmlError
+      raise("object of #{source.class}##{element.reader} should respond to :to_xml")
+    end
+
+    def complex_children(complex_root_node, object)
       if object.is_a?(XmlSchemaMapper)
         complex_node_from_mapper(complex_root_node, object)
       else
         complex_node_from_xml(complex_root_node, object)
       end
-    rescue NoToXmlError
-      raise("object of #{source.class}##{element.reader} should respond to :to_xml")
     end
 
-    def complex_node_from_xml(root, object)
-      return root if object.nil?
-      if object.respond_to?(:to_xml)
-        root << object.to_xml
+    def complex_node_from_xml(complex_root_node, object)
+      return complex_root_node if object.nil?
+      if object.is_a?(Array)
+        list = object.map do |o|
+          complex_node_item = complex_root_node.dup
+          complex_children(complex_node_item, o)
+        end
+        Nokogiri::XML::NodeSet.new(complex_root_node.document, list)
+      elsif object.respond_to?(:to_xml)
+        complex_root_node << object.to_xml
       else
         raise NoToXmlError
       end
     end
 
-    def complex_node_from_mapper(root, object)
-      XmlSchemaMapper::Builder.build(object, root).parent
+    def complex_node_from_mapper(complex_root_node, object)
+      XmlSchemaMapper::Builder.build(object, complex_root_node).parent
     end
 
     def add_element_namespace_to_root!(element)
