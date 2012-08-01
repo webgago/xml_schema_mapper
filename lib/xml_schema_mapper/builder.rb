@@ -56,7 +56,15 @@ module XmlSchemaMapper
     end
 
     def simple_node(element)
-      document.create_element(element.name, element.content_from(source))
+      value = source.send(element.reader)
+      if value.is_a? Array
+        list = value.map do |i|
+          document.create_element(element.name, i)
+        end
+        Nokogiri::XML::NodeSet.new(document, list)
+      else
+        document.create_element(element.name, element.content_from(source))
+      end
     end
 
     def complex_node(element)

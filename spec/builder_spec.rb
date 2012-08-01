@@ -43,7 +43,7 @@ describe XmlSchemaMapper::Builder do
 
     it "should add namespace to root node" do
       namespace = stub(prefix: 'w', href: 'namespace')
-      element.stub(namespace: 'namespace')
+      element.stub(reader: 'is_out', namespace: 'namespace')
       subject.stub_chain('schema.namespaces.find_by_href').and_return(namespace)
 
       subject.build
@@ -113,6 +113,7 @@ describe XmlSchemaMapper::Builder do
 
       subject.build
     end
+
     it "if array build element for each" do
       object.stub(array_mappers: [object.filter,object.filter])
       complex_element.stub(namespace: 'http://example.com/common/', reader: 'array_mappers')
@@ -120,6 +121,14 @@ describe XmlSchemaMapper::Builder do
 
       subject.parent.should_receive(:<<).with(instance_of(Nokogiri::XML::NodeSet))
       subject.build
+    end
+
+    it "if array build element for each" do
+      mapper = ArrayNamespace::ArrayOfStringsMapper.new
+      mapper.item = [1,2,3,4]
+      subj = XmlSchemaMapper::Builder.new(mapper, document.root)
+      subj.build
+      document.root.search('.//item').count.should eql 4
     end
 
     it "should raise error when don't respond to :to_xml'" do

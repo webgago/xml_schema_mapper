@@ -120,4 +120,13 @@ module ArrayNamespace
       attr_accessor e.reader
     end
   end
+
+  class ArrayOfStringsMapper
+    include XmlSchemaMapper
+    schema 'spec/fixtures/UserService.xsd'
+    type 'ArrayOfStrings'
+    elements.each do |e|
+      attr_accessor e.reader
+    end
+  end
 end

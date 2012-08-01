@@ -52,6 +52,15 @@
     </xs:sequence>
   </xs:complexType>
 
+  <xs:complexType name="ArrayOfStrings">
+    <xs:annotation>
+      <xs:documentation>Array</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="item" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:element name="gender">
     <xs:simpleType>
       <xs:restriction base="xs:string">
@@ -74,4 +83,5 @@
   <xs:element name="getFirstName" type="tns:GetFirstName"/>
   <xs:element name="getFirstNames" type="tns:ArrayOfGetFirstName"/>
   <xs:element name="getLastName" type="tns:GetLastName"/>
+  <xs:element name="getTypes" type="tns:ArrayOfStrings"/>
 </xs:schema>
