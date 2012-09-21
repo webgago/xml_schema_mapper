@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://example.com/UserService/type/" xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:com="http://example.com/common/"
-           targetNamespace="http://example.com/UserService/type/" version="1.0">
+           targetNamespace="http://example.com/UserService/type/" version="1.0" elementFormDefault="qualified">
 
   <xs:import namespace="http://example.com/common/" schemaLocation="common.xsd"/>
 
@@ -24,6 +24,7 @@
       <xs:element name="options" type="com:Options"/>
     </xs:sequence>
     <xs:attribute name="id" type="xs:string"/>
+    <xs:attribute name="default" type="xs:string" use="required"/>
   </xs:complexType>
 
   <xs:complexType name="GetLastName">

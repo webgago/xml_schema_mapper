@@ -1,13 +1,13 @@
 <tns:getFirstName xmlns:tns="http://example.com/UserService/type/" xmlns:cm="http://example.com/common/">
-  <userIdentifier>001</userIdentifier>
+  <tns:userIdentifier>001</tns:userIdentifier>
   <tns:filter>
     <tns:age>50</tns:age>
     <tns:gender>male</tns:gender>
   </tns:filter>
-  <isOut>a</isOut>
+  <tns:isOut>a</tns:isOut>
   <cm:zone>b</cm:zone>
-  <options>
-    <one>one</one>
-    <two>two</two>
-  </options>
+  <tns:options>
+    <cm:one>one</cm:one>
+    <cm:two>two</cm:two>
+  </tns:options>
 </tns:getFirstName>

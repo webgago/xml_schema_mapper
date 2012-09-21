@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<getFirstNames xmlns:cm="http://example.com/common/" xmlns:tns="http://example.com/UserService/type/">
-  <query>
-    <userIdentifier>xoMPRY</userIdentifier>
+<tns:getFirstNames xmlns:cm="http://example.com/common/" xmlns:tns="http://example.com/UserService/type/">
+  <tns:query>
+    <tns:userIdentifier>xoMPRY</tns:userIdentifier>
     <tns:filter>
       <tns:age>94</tns:age>
       <tns:gender>male</tns:gender>
     </tns:filter>
-    <isOut>a</isOut>
+    <tns:isOut>a</tns:isOut>
     <cm:zone>b</cm:zone>
-    <options>
-      <one>p6E58</one>
-      <two>Vm1sk87pkU0pE4EKKSY</two>
-    </options>
-  </query>
-  <query>
-    <userIdentifier>xoMPRY</userIdentifier>
+    <tns:options>
+      <cm:one>p6E58</cm:one>
+      <cm:two>Vm1sk87pkU0pE4EKKSY</cm:two>
+    </tns:options>
+  </tns:query>
+  <tns:query>
+    <tns:userIdentifier>xoMPRY</tns:userIdentifier>
     <tns:filter>
       <tns:age>94</tns:age>
       <tns:gender>male</tns:gender>
     </tns:filter>
-    <isOut>a</isOut>
+    <tns:isOut>a</tns:isOut>
     <cm:zone>b</cm:zone>
-    <options>
-      <one>p6E58</one>
-      <two>Vm1sk87pkU0pE4EKKSY</two>
-    </options>
-  </query>
-</getFirstNames>
+    <tns:options>
+      <cm:one>p6E58</cm:one>
+      <cm:two>Vm1sk87pkU0pE4EKKSY</cm:two>
+    </tns:options>
+  </tns:query>
+</tns:getFirstNames>

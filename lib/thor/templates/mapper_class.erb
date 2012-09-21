@@ -16,7 +16,7 @@ class <%= mapper_name %>
 <%- end -%>
 
 <%- subclasses.each do |subclass, type| -%>
-  class <%= subclass %>
+  class <%= subclass.split('::').map(&:camelize).join('::') %>
     include XmlSchemaMapper
     schema '<%= schema_path %>'
     annonymus_type '<%= [name.camelize, subclass].join('::') %>'

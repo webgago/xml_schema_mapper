@@ -23,7 +23,7 @@ module XmlSchemaMapper
       if element.simple?
         instance.send(element.writer, content_for(node)) if instance.respond_to?(element.writer)
       else
-        instance.send(element.writer, element_parser(element).parse(node)) if instance.respond_to?(element.writer)
+        instance.send(element.writer, resolve_element_parser(element).parse(node)) if instance.respond_to?(element.writer)
       end
     end
 
@@ -35,19 +35,9 @@ module XmlSchemaMapper
         end
       else
         get_nodes_by_xpath(element, xml).each do |node|
-          instance.send(element.reader) << element_parser(element).parse(node) if instance.respond_to?(element.writer)
+          instance.send(element.reader) << resolve_element_parser(element).parse(node) if instance.respond_to?(element.writer)
         end
       end
-    end
-
-    def element_parser(e)
-      find_class(e)
-    end
-
-    def find_class(e)
-      "#{@module.name}::#{e.mapper_class_name}".safe_constantize ||
-          "#{@klass.name}::#{e.klass_name}".safe_constantize ||
-          "#{e.klass_name}".constantize
     end
 
     def content_for(node)
@@ -76,6 +66,19 @@ module XmlSchemaMapper
     end
 
     private
+
+    def resolve_element_parser(element)
+      parsers_for_resolve(element).find(&:safe_constantize).safe_constantize or raise_class_not_found(e)
+    end
+
+    def parsers_for_resolve(element)
+      %W(#{element.mapper_class_name} #{element.klass_name} #{@klass.name}::#{element.klass_name})
+    end
+
+    def raise_class_not_found(element)
+      raise NameError, "No one of the classes #{parsers_for_resolve(element)} cannot be found"
+    end
+
     def resolve_module
       if @klass.name.index('::')
         @klass.name[0..@klass.name.index('::')-1].safe_constantize

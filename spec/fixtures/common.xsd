@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:cm="http://example.com/common/" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           targetNamespace="http://example.com/common/" version="1.0">
+           targetNamespace="http://example.com/common/" elementFormDefault="qualified" version="1.0">
 
   <xs:simpleType name="ZONE">
     <xs:restriction base="xs:string">

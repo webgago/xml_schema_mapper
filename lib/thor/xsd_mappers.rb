@@ -77,12 +77,19 @@ module XsdMappers
     def element_annotation(element)
       type    = element.type.name || "#{element.name}"
       comment = element.annotation || element.type.annotation
-      if  [LibXML::XML::Schema::Types::XML_SCHEMA_TYPE_SIMPLE,
-           LibXML::XML::Schema::Types::XML_SCHEMA_TYPE_BASIC].include?(element.type.kind)
-        "@return [#{type.camelize}] #{comment}"
+
+      if is_a_simple?(element.type)
+        "#{comment}\n" <<
+            "@return [#{type.camelize}]"
       else
-        "@return [#{module_name}#{type.camelize}Mapper] #{comment}"
+        "#{comment}\n" <<
+            "@return [#{module_name}#{type.camelize}Mapper]"
       end
+    end
+
+    def is_a_simple?(type)
+      [LibXML::XML::Schema::Types::XML_SCHEMA_TYPE_SIMPLE,
+       LibXML::XML::Schema::Types::XML_SCHEMA_TYPE_BASIC].include?(type.kind)
     end
 
     def module_name

@@ -19,6 +19,19 @@ module XmlSchemaMapper
       ].include? type.kind
     end
 
+    def elements
+      xsd.elements.values.map { |e| XmlSchemaMapper::Element.new(e) }
+    end
+
+    def accept(visitor, data, *args)
+      case data
+      when Array
+        visitor.visit_array(self, data, *args)
+      else
+        visitor.visit(self, data, *args)
+      end
+    end
+
     def content_from(object)
       data = object.send(reader)
       data.respond_to?(:to_xml) ? data.to_xml : data

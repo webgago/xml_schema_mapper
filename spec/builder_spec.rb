@@ -98,8 +98,6 @@ describe XmlSchemaMapper::Builder do
       subject.build
 
       element_node.namespace.should be_nil
-      one_node.namespace.should be_nil
-      two_node.namespace.should be_nil
     end
 
     it "should accept not a XmlSchemaMapper for node" do
@@ -128,7 +126,7 @@ describe XmlSchemaMapper::Builder do
       mapper.item = [1,2,3,4]
       subj = XmlSchemaMapper::Builder.new(mapper, document.root)
       subj.build
-      document.root.search('.//item').count.should eql 4
+      document.root.search('.//t:item', 't' => 'http://example.com/UserService/type/').count.should eql 4
     end
 
     it "should raise error when don't respond to :to_xml'" do

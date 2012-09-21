@@ -2,7 +2,10 @@
 # @note <%= type.annotation.to_s.gsub("\n", "\n# ") %>
 
 <%-  elements.each do |element| -%>
-# @attr <%= element.name %> [<%= element.type.name %>] <%= element.annotation || element.type.annotation %>
+  <%- (element.annotation || element.type.annotation).each_line do |line| -%>
+# <%= line %>
+  <%- end -%>
+# @attr <%= element.name %> [<%= element.type.name %>]
 <%- end -%>
 
 <%- if options[:converter_module_name].present? -%>

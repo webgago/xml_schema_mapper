@@ -34,6 +34,7 @@ module XmlSchemaMapper
       raise(%Q{call "schema 'path/to/your/File.xsd'" before calling "type"}) unless _schema
       if name
         self._type = _schema.types[name]
+        attr_accessor :attrs
       else
         self._type
       end
@@ -67,6 +68,9 @@ module XmlSchemaMapper
       end
     end
 
+    def attrs
+      @attrs ||= type.attributes
+    end
   end
 
   def accept(visitor, *args)
@@ -74,11 +78,11 @@ module XmlSchemaMapper
   end
 
   def simple?
-    type.simple?
+    _type.simple?
   end
 
   def values
-    type.facets.map &:value
+    _type.facets.map &:value
   end
 
   def type
@@ -104,7 +108,7 @@ module XmlSchemaMapper
   end
 
   def xml_document
-    document = XmlSchemaMapper::Builder.create_document(type)
+    document = XmlSchemaMapper::Builder.create_document(_type)
     if global_element
       ns = schema.namespaces.find_by_href(global_element.namespace)
       document.root.namespace = document.root.add_namespace_definition(ns.prefix, ns.href)
@@ -116,7 +120,7 @@ module XmlSchemaMapper
   end
 
   def global_element
-    schema.elements.values.find { |e| e.type.name == type.name }
+    schema.elements.values.find { |e| e.type.name == _type.name }
   end
 
 end

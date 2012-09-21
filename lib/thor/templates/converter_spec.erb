@@ -1,11 +1,8 @@
-# encoding: utf-8
-# <%= type.annotation.to_s.gsub("\n", "\n# ") %>
+require 'spec_helper'
 
 <%-  elements.each do |element| -%>
-# @attr <%= element.name %> [<%= element.type.name %>] <%= element.type.annotation %>
+# @attr <%= element.name %> [<%= element.type.name %>]
 <%- end %>
-
-require 'spec_helper'
 
 <%- if options[:converter_module_name].present? -%>
 describe <%= options[:converter_module_name] %>::<%= name.camelize %>Converter do

@@ -1,15 +1,22 @@
-# encoding: utf-8
-# <%= type.annotation.to_s.gsub("\n", "\n# ") %>
+require 'spec_helper'
+require "xml_schema_mapper/test_builder"
 
 <%-  elements.each do |element| -%>
-  # @attr <%= element.name %> [<%= element.type.name %>] <%= element.type.annotation %>
+  # @attr <%= element.name %> [<%= element.type.name %>]
 <%- end %>
-
-require 'spec_helper'
 
 <%- if options[:module_name].present? -%>
 describe <%= options[:module_name] %>::<%= name.camelize %>Mapper do
 <% else -%>
 describe <%= name.camelize %>Mapper do
 <% end -%>
+
+  include XmlSchemaMapper::TestBuilder::Helper
+
+  subject { build_described_mapper }
+
+  it "should be self-compatible xml <-> object" do
+    described_class.parse(subject.to_xml).to_xml.should eql subject.to_xml
+  end
+
 end
