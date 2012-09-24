@@ -8,7 +8,7 @@ require "xml_schema_mapper/test_builder"
 <%- if options[:module_name].present? -%>
 describe <%= options[:module_name] %>::<%= name.camelize %>Mapper do
 <% else -%>
-describe <%= name.camelize %>Mapper do
+describe <%= name.underscore.camelize %>Mapper do
 <% end -%>
 
   include XmlSchemaMapper::TestBuilder::Helper

@@ -101,7 +101,7 @@ module XsdMappers
     end
 
     def mapper_name
-      class_name = "#{name.camelize}Mapper"
+      class_name = "#{name.underscore.camelize}Mapper"
       "#{module_name}#{class_name}"
     end
   end
