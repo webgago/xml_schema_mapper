@@ -50,7 +50,7 @@ module XmlSchemaMapper
     end
 
     def converter_class
-      (klass_name + "Converter").constantize
+      (klass_name + "Converter").safe_constantize
     end
 
     def mapper_class
