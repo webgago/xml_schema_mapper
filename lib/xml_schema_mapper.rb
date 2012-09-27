@@ -73,6 +73,8 @@ module XmlSchemaMapper
     end
   end
 
+  delegate :first, :last, :[], to: :element_values
+
   def accept(visitor, *args)
     visitor.visit(self, *args)
   end
@@ -95,6 +97,10 @@ module XmlSchemaMapper
 
   def element_names
     elements.keys
+  end
+
+  def element_values
+    elements.values
   end
 
   def elements
