@@ -67,9 +67,9 @@ module XmlSchemaMapper
 
     def klass_name
       if type.name.nil?
-        name.camelize
+        name.underscore.camelize
       else
-        type.name.camelize
+        type.name.underscore.camelize
       end
     end
 
