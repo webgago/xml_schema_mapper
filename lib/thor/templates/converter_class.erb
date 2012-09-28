@@ -9,9 +9,9 @@
 <%- end -%>
 
 <%- if options[:converter_module_name].present? -%>
-class <%= options[:converter_module_name] %>::<%= name.camelize %>Converter < Converter
+class <%= options[:converter_module_name] %>::<%= converter_name %> < Converter
 <% else -%>
-class <%= name.camelize %>Converter < Converter
+class <%= converter_name %> < Converter
 <% end -%>
 
 <%-  elements.each do |element| -%>

@@ -5,8 +5,8 @@ require 'spec_helper'
 <%- end %>
 
 <%- if options[:converter_module_name].present? -%>
-describe <%= options[:converter_module_name] %>::<%= name.camelize %>Converter do
+describe <%= options[:converter_module_name] %>::<%= converter_name %> do
 <% else -%>
-describe <%= name.camelize %>Converter do
+describe <%= converter_name %> do
 <% end -%>
 end

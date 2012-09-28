@@ -128,5 +128,9 @@ module XsdMappers
         template 'templates/converter_spec.erb', File.join("#{test}/converters/", module_path, filename)
       end
     end
+
+    def converter_name
+      "#{name.underscore.camelize}Converter"
+    end
   end
 end
