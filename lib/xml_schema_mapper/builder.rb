@@ -22,7 +22,8 @@ module XmlSchemaMapper
       elements.each do |element|
         add_element_namespace_to_root!(element)
         node = create_node(element)
-        parent << node if node.is_a?(Nokogiri::XML::NodeSet) || node.content.present?
+
+        parent << node if can_add?(element, node)
 
         if node.is_a?(Nokogiri::XML::NodeSet)
           node.each { |n| n.namespace = nil if element.namespace.nil? }
@@ -31,6 +32,10 @@ module XmlSchemaMapper
         end
       end
       self
+    end
+
+    def can_add?(element, node)
+      node.is_a?(Nokogiri::XML::NodeSet) || node.content.present? || element.required?
     end
 
     private
