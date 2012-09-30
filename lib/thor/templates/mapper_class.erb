@@ -12,6 +12,7 @@ class <%= mapper_name %>
   <%- element_annotation(element).split("\n").delete_if(&:blank?).each do |comment| -%>
   # <%= comment %>
   <%- end -%>
+  # minOccurs: <%= element.min_occurs %>, maxOccurs: <%= element.max_occurs %>
   attr_accessor :<%= element.name.underscore %>
 <%- end -%>
 
@@ -25,6 +26,7 @@ class <%= mapper_name %>
     <%- element_annotation(element).split("\n").delete_if(&:blank?).each do |comment| -%>
     # <%= comment %>
     <%- end -%>
+    # minOccurs: <%= element.min_occurs %>, maxOccurs: <%= element.max_occurs %>
     attr_accessor :<%= element.name.underscore %>
   <%- end -%>
   end
