@@ -74,7 +74,14 @@ module XmlSchemaMapper
   end
 
   delegate :first, :last, :each, :length, :size, :all?, :any?, :one?, :empty?, to: :element_values
-  delegate :[], to: :elements
+
+  def [](key)
+    send(key)
+  end
+
+  def []=(key, val)
+    send(:"#{key}=", val)
+  end
 
   def accept(visitor, *args)
     visitor.visit(self, *args)
