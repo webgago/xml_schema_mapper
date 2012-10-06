@@ -35,8 +35,7 @@ module XmlSchemaMapper
     end
 
     def can_add?(element, node)
-      should_be = node.content.present? || (element.complex? && element.required?)
-      node.is_a?(Nokogiri::XML::NodeSet) || should_be #|| (element.required? && element.complex?)
+      node.is_a?(Nokogiri::XML::NodeSet) || (node.content.present? || (element.complex? && element.required?))
     end
 
     private
