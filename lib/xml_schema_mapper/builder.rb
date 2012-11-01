@@ -4,14 +4,15 @@ end
 module XmlSchemaMapper
   class Builder
 
-    attr_reader :document, :parent
+    attr_reader :document, :parent, :namespace_resolver
 
-    def initialize(source, parent)
-      @parent   = parent.is_a?(Nokogiri::XML::Document) ? parent.root : parent
-      @document = parent.document
-      @source   = source
-      @klass    = source.class
-      @schema   = @klass._schema
+    def initialize(source, parent, namespace_resolver)
+      @parent             = parent.is_a?(Nokogiri::XML::Document) ? parent.root : parent
+      @document           = parent.document
+      @source             = source
+      @klass              = source.class
+      @namespace_resolver = namespace_resolver
+      @schema             = @klass._schema
     end
 
     def elements
@@ -105,15 +106,24 @@ module XmlSchemaMapper
     end
 
     def complex_node_from_mapper(complex_root_node, object)
-      XmlSchemaMapper::Builder.build(object, complex_root_node).parent
+      XmlSchemaMapper::Builder.build(object, complex_root_node, namespace_resolver).parent
     end
 
     def add_element_namespace_to_root!(element)
       if element.namespace
-        ns = schema.namespaces.find_by_href(element.namespace)
+
+        ns = find_namespace(element)
         raise "prefix for namespace #{element.namespace.inspect} not found" unless ns
 
         document.root.add_namespace(ns.prefix, ns.href)
+      end
+    end
+
+    def find_namespace(element)
+      if namespace_resolver
+        namespace_resolver.find_by_href(element.namespace)
+      else
+        schema.namespaces.find_by_href(element.namespace)
       end
     end
 
@@ -129,8 +139,8 @@ module XmlSchemaMapper
       end
     end
 
-    def self.build(mapper, parent)
-      XmlSchemaMapper::Builder.new(mapper, parent).build
+    def self.build(mapper, parent, namespace_resolver)
+      XmlSchemaMapper::Builder.new(mapper, parent, namespace_resolver).build
     end
 
   end

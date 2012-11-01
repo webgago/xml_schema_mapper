@@ -11,13 +11,16 @@ require "virtus"
 require "xml_schema_mapper/element"
 require "xml_schema_mapper/parser"
 require "xml_schema_mapper/builder"
+require "xml_schema_mapper/namespace_resolver"
 
 module XmlSchemaMapper
   extend ActiveSupport::Concern
+  mattr_accessor :namespace_resolver_class
 
   included do
     class_attribute :_schema
     class_attribute :_type
+    class_attribute :namespace_resolver_class
     include Virtus
   end
 
@@ -123,14 +126,24 @@ module XmlSchemaMapper
 
   def xml_document
     document = XmlSchemaMapper::Builder.create_document(_type)
-    if global_element
-      ns = schema.namespaces.find_by_href(global_element.namespace)
-      document.root.namespace = document.root.add_namespace_definition(ns.prefix, ns.href)
-    end
 
-    builder = XmlSchemaMapper::Builder.new(self, document.root)
+    ns                      = namespace_resolver.find_by_href (global_element || type).namespace
+    document.root.namespace = document.root.add_namespace_definition(ns.prefix, ns.href)
+
+    builder                    = XmlSchemaMapper::Builder.new(self, document.root, namespace_resolver)
     builder.build
     builder.document
+  end
+
+  def namespace_resolver
+    case
+    when self.class.namespace_resolver_class
+      self.class.namespace_resolver_class.new(schema.namespaces)
+    when XmlSchemaMapper.namespace_resolver_class
+      XmlSchemaMapper.namespace_resolver_class.new(schema.namespaces)
+    else
+      schema.namespaces
+    end
   end
 
   def global_element
