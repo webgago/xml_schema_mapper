@@ -127,7 +127,7 @@ module XmlSchemaMapper
   def xml_document
     document = XmlSchemaMapper::Builder.create_document(_type)
 
-    ns                      = namespace_resolver.find_by_href (global_element || type).namespace
+    ns                      = namespace_resolver.find_by_href (global_element || _type).namespace
     document.root.namespace = document.root.add_namespace_definition(ns.prefix, ns.href)
 
     builder                    = XmlSchemaMapper::Builder.new(self, document.root, namespace_resolver)
