@@ -48,7 +48,7 @@ module XmlSchemaMapper
       path       = name.split('::')
       type       = _schema.types[path.shift]
       self._type = path.map do |n|
-        type = type.elements[n].type
+        type = type.elements[n].type if type
       end.last
     end
 
