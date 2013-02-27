@@ -74,6 +74,14 @@ module XmlSchemaMapper
     def attrs
       @attrs ||= type.attributes
     end
+
+    def build_tree
+      instance = new
+      self.elements.each do |e|
+        instance[e.reader] = e.mapper_class.build_tree if e.complex?
+      end
+      instance
+    end
   end
 
   delegate :first, :last, :each, :length, :size, :all?, :any?, :one?, :empty?, to: :element_values
