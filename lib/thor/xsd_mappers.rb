@@ -6,20 +6,17 @@ module XsdMappers
 
     desc 'generate path/to/xsd', 'generate mappers for xsd types'
     method_option :module_name, default: ''
-    method_option :converter_module_name, default: ''
-    method_option :'skip-converters', type: :boolean
 
     def generate(schema_path)
       schema(schema_path).types.each do |name, _|
         Mappers.new([name, schema_path], options).invoke_all
-        Converters.new([name, schema_path], options).invoke_all unless options[:'skip-converters']
       end
     end
 
     protected
 
     def schema(path)
-      @schema ||= LibXML::XML::Schema.cached(path)
+      @schema = LibXML::XML::Schema.cached(path)
     end
 
   end
@@ -103,34 +100,6 @@ module XsdMappers
     def mapper_name
       class_name = "#{name.underscore.camelize}Mapper"
       "#{module_name}#{class_name}"
-    end
-  end
-
-  class Converters < Mappers
-    class_option :attributes, type: :array
-    class_option :converter_module_name, default: ""
-    class_option :force, default: false
-    class_option :skip, default: true
-
-    def module_path
-      options[:converter_module_name] ? options[:converter_module_name].underscore : ""
-    end
-
-    def create_lib_file
-      filename = "#{name.underscore}_converter.rb"
-      template('templates/converter_class.erb', File.join('app/converters/', module_path, filename))
-    end
-
-    def create_test_file
-      test     = options[:test_framework] == "test" ? :test : :spec
-      filename = "#{name.underscore}_converter_#{test}.rb"
-      with_padding do
-        template 'templates/converter_spec.erb', File.join("#{test}/converters/", module_path, filename)
-      end
-    end
-
-    def converter_name
-      "#{name.underscore.camelize}Converter"
     end
   end
 end
