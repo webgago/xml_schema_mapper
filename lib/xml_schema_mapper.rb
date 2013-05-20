@@ -45,8 +45,8 @@ module XmlSchemaMapper
 
     def annonymus_type(name)
       raise(%Q{call "schema 'path/to/your/File.xsd'" before calling "type"}) unless _schema
-      path       = name.split('::')
-      type       = _schema.types[path.shift]
+      path = name.split('::')
+      type = _schema.types[path.shift]
       self._type = path.map do |n|
         type = type.elements[n].type if type
       end.last
@@ -55,13 +55,13 @@ module XmlSchemaMapper
     def parse(string_or_node)
       return if string_or_node.nil?
       case string_or_node
-      when String
-        string = File.exist?(string_or_node) ? File.read(string_or_node) : string_or_node
-        XmlSchemaMapper::Parser.new(self).parse(string)
-      when Nokogiri::XML::Node
-        XmlSchemaMapper::Parser.new(self).parse(string_or_node)
-      else
-        raise(ArgumentError, "param must be a String or Nokogiri::XML::Node, but \"#{string_or_node.inspect}\" given")
+        when String
+          string = File.exist?(string_or_node) ? File.read(string_or_node) : string_or_node
+          XmlSchemaMapper::Parser.new(self).parse(string)
+        when Nokogiri::XML::Node
+          XmlSchemaMapper::Parser.new(self).parse(string_or_node)
+        else
+          raise(ArgumentError, "param must be a String or Nokogiri::XML::Node, but \"#{string_or_node.inspect}\" given")
       end
     end
 
@@ -123,34 +123,36 @@ module XmlSchemaMapper
   end
 
   def elements
-    type.elements.values.inject({ }) do |hash, element|
+    type.elements.values.inject({}) do |hash, element|
       hash.merge element.name.underscore.to_sym => send(element.name.underscore.to_sym)
     end
   end
 
-  def to_xml(options = { })
-    xml_document.root.to_xml({ :encoding => 'UTF-8' }.merge(options))
+  def to_xml(options = {})
+    xml_document.root.to_xml({:encoding => 'UTF-8'}.merge(options))
   end
 
   def xml_document
     document = XmlSchemaMapper::Builder.create_document(_type)
+    document.root.namespace = root_namespace
 
-    ns                      = namespace_resolver.find_by_href (global_element || _type).namespace
-    document.root.namespace = document.root.add_namespace_definition(ns.prefix, ns.href)
-
-    builder                    = XmlSchemaMapper::Builder.new(self, document.root, namespace_resolver)
+    builder = XmlSchemaMapper::Builder.new(self, document.root, namespace_resolver)
     builder.build
     builder.document
   end
 
+  def root_namespace
+    namespaces = namespace_resolver || schema.namespaces
+    ns = namespaces.find_by_href (global_element || _type).namespace
+    document.root.add_namespace_definition(ns.prefix, ns.href)
+  end
+
   def namespace_resolver
     case
-    when self.class.namespace_resolver_class
-      self.class.namespace_resolver_class.new(schema.namespaces)
-    when XmlSchemaMapper.namespace_resolver_class
-      XmlSchemaMapper.namespace_resolver_class.new(schema.namespaces)
-    else
-      schema.namespaces
+      when self.class.namespace_resolver_class
+        self.class.namespace_resolver_class.new(schema.namespaces)
+      when XmlSchemaMapper.namespace_resolver_class
+        XmlSchemaMapper.namespace_resolver_class.new(schema.namespaces)
     end
   end
 

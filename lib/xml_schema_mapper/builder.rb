@@ -113,7 +113,7 @@ module XmlSchemaMapper
       if element.namespace
 
         ns = find_namespace(element)
-        raise "prefix for namespace #{element.namespace.inspect} not found" unless ns
+        raise "prefix for namespace #{element.namespace.inspect} not found. element: #{element.inspect}" unless ns
 
         document.root.add_namespace(ns.prefix, ns.href)
       end
