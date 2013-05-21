@@ -134,14 +134,14 @@ module XmlSchemaMapper
 
   def xml_document
     document = XmlSchemaMapper::Builder.create_document(_type)
-    document.root.namespace = root_namespace
+    document.root.namespace = find_root_namespace(document)
 
     builder = XmlSchemaMapper::Builder.new(self, document.root, namespace_resolver)
     builder.build
     builder.document
   end
 
-  def root_namespace
+  def find_root_namespace(document)
     namespaces = namespace_resolver || schema.namespaces
     ns = namespaces.find_by_href (global_element || _type).namespace
     document.root.add_namespace_definition(ns.prefix, ns.href)
