@@ -103,3 +103,19 @@ module XsdMappers
     end
   end
 end
+
+module LibXML
+  module XML
+    class Schema::Type
+      def annonymus_subtypes_recursively(parent=nil)
+        annonymus_subtypes.map do |element_name, e|
+          parent_name = [parent, element_name].compact.join('::')
+
+          [{parent_name => e.type},
+           e.type.annonymus_subtypes_recursively(parent_name)]
+
+        end.flatten
+      end
+    end
+  end
+end
