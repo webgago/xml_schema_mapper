@@ -72,7 +72,7 @@ module XmlSchemaMapper
     end
 
     def parsers_for_resolve(element)
-      %W(#{element.mapper_class_name} #{element.klass_name} #{@klass.name}::#{element.klass_name})
+      %W(#{@klass.name}::#{element.klass_name} #{element.mapper_class_name} #{element.klass_name})
     end
 
     def raise_class_not_found(element)
