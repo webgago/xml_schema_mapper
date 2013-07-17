@@ -57,12 +57,16 @@ module XmlSchemaMapper
       (klass_name + "Converter").safe_constantize
     end
 
-    def mapper_class
-      mapper_class_name.constantize
+    def mapper_class(safe=false)
+      safe ? mapper_class_name.safe_constantize : mapper_class_name.constantize
     end
 
     def mapper_class_name
       klass_name + "Mapper"
+    end
+
+    def klass
+      klass_name.safe_constantize
     end
 
     def klass_name

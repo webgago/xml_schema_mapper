@@ -1,13 +1,13 @@
 module XmlSchemaMapper
   class Parser
     def initialize(klass)
-      @klass  = klass
+      @klass = klass
       @module = resolve_module
     end
 
     def parse(xml)
       instance = @klass.new
-      xml      = document(xml)
+      xml = document(xml)
       @klass.elements.each do |e|
         if e.array?
           write_array_element(e, instance, xml)
@@ -68,7 +68,13 @@ module XmlSchemaMapper
     private
 
     def resolve_element_parser(element)
-      parsers_for_resolve(element).find(&:safe_constantize).safe_constantize or raise_class_not_found(e)
+      element_class_in_current_namespace(element) || element.mapper_class(true) || element.klass || raise_class_not_found(element)
+    end
+
+    def element_class_in_current_namespace(element) # prevent top-level constant referencing
+      if @klass.const_defined?(element.klass_name, false)
+        @klass.const_get(element.klass_name, false)
+      end
     end
 
     def parsers_for_resolve(element)
